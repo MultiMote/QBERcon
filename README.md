@@ -24,6 +24,8 @@ QBERcon - BattlEye Rcon connector for Qt5 C++
     QBERcon::ERROR_LOGIN_FAILED             // Wrong password
     QBERcon::ERROR_KEEPALIVE_EXCEEDED       // Timeout
     QBERcon::ERROR_MISSING_LOGIN_DATA       // No login/password specified
+    QBERcon::ERROR_DNS_ERRROR               // DNS Lookup error
+    QBERcon::ERROR_SOCKET_ERRROR            // Socket error
 ```
 
 Not fully tested. Use at your own risk. 

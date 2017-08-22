@@ -40,6 +40,7 @@ void QBERcon::Client::connectToServer(QString password, QString hostname, quint1
 void QBERcon::Client::hostLookupFinished() {
     if (dns->error() != QDnsLookup::NoError) {
         qDebug() << "DNS Lookup failed" << dns->error() << dns->errorString();
+        emit error(QBERcon::ERROR_DNS_ERRROR);
         return;
     }
     if(dns->hostAddressRecords().size() > 0) {
@@ -94,6 +95,7 @@ void QBERcon::Client::socketDisconnected() {
 
 void QBERcon::Client::socketError(QAbstractSocket::SocketError err) {
     qDebug() << "QAbstractSocket::SocketError:" << err;
+    emit error(QBERcon::ERROR_SOCKET_ERRROR);
     disconnectFromServer();
 }
 
