@@ -39,16 +39,15 @@ void QBERcon::Client::connectToServer(QString password, QString hostname, quint1
 
 void QBERcon::Client::hostLookupFinished() {
     if (dns->error() != QDnsLookup::NoError) {
-        qDebug() << "DNS Lookup failed" << dns->error() << dns->errorString();
+        qDebug() << "QBERcon: DNS Lookup failed" << dns->error() << dns->errorString();
         emit error(QBERcon::ERROR_DNS_ERRROR);
         return;
     }
     if(dns->hostAddressRecords().size() > 0) {
         host = dns->hostAddressRecords().first().value();
-        qDebug() << "DNS Lookup OK:" << host;
         socket->connectToHost(host, port, QAbstractSocket::ReadWrite);
     } else {
-        qDebug() << "DNS Lookup failed, no records";
+        qDebug() << "QBERcon: DNS Lookup failed, no records";
     }
 }
 
@@ -63,9 +62,13 @@ void QBERcon::Client::keepAliveTimerTimeout() {
 }
 
 void QBERcon::Client::read() {
+    qint64 size = socket->pendingDatagramSize();
     QByteArray data;
-    data.resize(socket->pendingDatagramSize());
+    data.resize(size);
     socket->readDatagram(data.data(), data.size());
+
+    if(size < 1)
+        return;
     handleData(data);
 }
 
@@ -94,7 +97,7 @@ void QBERcon::Client::socketDisconnected() {
 }
 
 void QBERcon::Client::socketError(QAbstractSocket::SocketError err) {
-    qDebug() << "QAbstractSocket::SocketError:" << err;
+    qDebug() << "QBERcon:" << err;
     emit error(QBERcon::ERROR_SOCKET_ERRROR);
     disconnectFromServer();
 }
