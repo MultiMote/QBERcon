@@ -3,6 +3,8 @@
 
 QBERcon::Client::Client(QObject *parent) : QObject(parent) {
     this->port = 2302;
+    connectedToServer = false;
+    connecting = false;
     commandSequenceNumber = 0;
     keepAliveInterval = 5000;
     keepAliveTimer = new QTimer(this);
