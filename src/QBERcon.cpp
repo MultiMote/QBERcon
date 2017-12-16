@@ -103,7 +103,8 @@ void QBERcon::Client::socketDisconnected() {
 }
 
 void QBERcon::Client::socketError(QAbstractSocket::SocketError err) {
-    qDebug() << "QBERcon:" << err;
+    Q_UNUSED(err)
+    //qDebug() << "QBERcon:" << err;
     emit error(QBERcon::ERROR_SOCKET_ERROR);
     disconnectFromServer();
 }
