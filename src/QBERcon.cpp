@@ -29,6 +29,8 @@ void QBERcon::Client::connectToServer(QString password, QString hostname, quint1
         emit error(QBERcon::ERROR_MISSING_LOGIN_DATA);
         return;
     }
+    connecting = true;
+
     this->hostname = hostname;
     this->port = port;
     this->password = password;
@@ -40,13 +42,15 @@ void QBERcon::Client::connectToServer(QString password, QString hostname, quint1
 void QBERcon::Client::hostLookupFinished() {
     if (dns->error() != QDnsLookup::NoError) {
         qDebug() << "QBERcon: DNS Lookup failed" << dns->error() << dns->errorString();
-        emit error(QBERcon::ERROR_DNS_ERRROR);
+        connecting = false;
+        emit error(QBERcon::ERROR_DNS_ERROR);
         return;
     }
     if(dns->hostAddressRecords().size() > 0) {
         host = dns->hostAddressRecords().first().value();
         socket->connectToHost(host, port, QAbstractSocket::ReadWrite);
     } else {
+        connecting = false;
         qDebug() << "QBERcon: DNS Lookup failed, no records";
     }
 }
@@ -81,6 +85,7 @@ void QBERcon::Client::socketConnected() {
 
 void QBERcon::Client::disconnectFromServer() {
     connectedToServer = false;
+    connecting = false;
     keepAliveTimer->stop();
     socket->disconnectFromHost();
 }
@@ -93,12 +98,13 @@ quint8 QBERcon::Client::sendCommand(QString cmd) {
 
 void QBERcon::Client::socketDisconnected() {
     connectedToServer = false;
+    connecting = false;
     emit disconnected();
 }
 
 void QBERcon::Client::socketError(QAbstractSocket::SocketError err) {
     qDebug() << "QBERcon:" << err;
-    emit error(QBERcon::ERROR_SOCKET_ERRROR);
+    emit error(QBERcon::ERROR_SOCKET_ERROR);
     disconnectFromServer();
 }
 
@@ -143,6 +149,7 @@ void QBERcon::Client::handleData(QByteArray &data) {
         quint8 result = data.at(2);
         if(result == 0x01) {
             connectedToServer = true;
+            connecting = false;
             emit connected();
         } else {
             emit error(QBERcon::ERROR_LOGIN_FAILED);
@@ -215,6 +222,10 @@ void QBERcon::Client::sendPacket(QBERcon::PacketType type, QVariant data) {
 
 bool QBERcon::Client::isConnected() const {
     return connectedToServer;
+}
+
+bool QBERcon::Client::isConnecting() const {
+    return connecting;
 }
 
 void QBERcon::Client::setKeepAliveInterval(int value) {

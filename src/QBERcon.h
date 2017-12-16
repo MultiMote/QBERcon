@@ -18,8 +18,8 @@ enum RconError {
     ERROR_LOGIN_FAILED,
     ERROR_KEEPALIVE_EXCEEDED,
     ERROR_MISSING_LOGIN_DATA,
-    ERROR_DNS_ERRROR,
-    ERROR_SOCKET_ERRROR
+    ERROR_DNS_ERROR,
+    ERROR_SOCKET_ERROR
 };
 
 
@@ -32,6 +32,7 @@ public:
     void disconnectFromServer();
     quint8 sendCommand(QString cmd);
     bool isConnected() const;
+    bool isConnecting() const;
     void setKeepAliveInterval(int value);
 
 signals:
@@ -65,6 +66,7 @@ private:
 
     quint8 commandSequenceNumber;    
     bool connectedToServer;
+    bool connecting;
     int keepAliveInterval;
     bool keepAliveReceived;
     QString multipartMessageData;
